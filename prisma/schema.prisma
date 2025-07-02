@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  BOOLEAN
+  TEXT
+  CHOICE
+  NUMBER
+  PERCENTAGE
+  RANGE
+}
+
+model User {
+  id              String          @id @default(cuid())
+  email           String?         @unique
+  name            String?
+  image           String?
+  emailVerified   DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  accounts        Account[]
+  stacks          Stack[]
+  answerStatuses  AnswerStatus[]
+}
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Stack {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  ownerId     String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  owner       User       @relation(fields: [ownerId], references: [id])
+  questions   Question[]
+}
+
+model Question {
+  id                   String       @id @default(cuid())
+  stackId              String
+  content              String
+  type                 QuestionType
+  choices              String[]
+  allowMultipleAnswers Boolean      @default(false)
+  minValue             Float?
+  maxValue             Float?
+  createdAt            DateTime     @default(now())
+
+  stack                Stack        @relation(fields: [stackId], references: [id])
+  answers              Answer[]
+  answerStatuses       AnswerStatus[]
+}
+
+model AnswerStatus {
+  id         String   @id @default(cuid())
+  userId     String
+  questionId String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
+
+  @@unique([userId, questionId])
+}
+
+model Answer {
+  id                 String   @id @default(cuid())
+  questionId         String
+  userAnswerBoolean  Boolean?
+  userAnswerText     String?
+  userAnswerChoice   String[]
+  userAnswerNumber   Float?
+  createdAt          DateTime @default(now())
+
+  question           Question @relation(fields: [questionId], references: [id])
+}
