@@ -38,7 +38,7 @@ export default async function StackPage({ params }: { params: { id: string } }) 
     if (!stack) return notFound();
 
     return (
-        <div className="flex flex-col overflow-hidden text-white bg-zinc-950">
+        <div className="min-h-screen flex flex-col text-white bg-zinc-950">
             {/* Header */}
             <div className="shrink-0 border-b border-zinc-800 px-4 py-4 flex items-center justify-between gap-3">
                 {/* Back Link */}
@@ -111,16 +111,22 @@ export default async function StackPage({ params }: { params: { id: string } }) 
                 </Dialog>
             </div>
 
-            {/* Scrollable Questions area */}
-            <div className="flex-1 overflow-y-auto">
-                <div className="px-4 py-6 flex flex-wrap gap-4 justify-center">
-                    {stack.questions.map((q) => (
-                        <div
-                            key={q.id}
-                            className="flex-1 min-w-[250px] max-w-sm grow sm:basis-[45%] md:basis-[30%] lg:basis-[22%]"
-                        >
-                            <Card className="bg-zinc-900 border border-zinc-800 h-full">
-                                <CardContent className="p-4">
+            <div className="p-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {stack.questions.map((q) => (
+                    <Card
+                        key={q.id}
+                        className="bg-zinc-900 border border-zinc-800 flex flex-col"
+                    >
+                        <CardContent className="p-4 flex flex-col gap-2">
+                            <p className="font-medium break-words">{q.content}</p>
+                            <p className="text-xs text-zinc-400">{q.type}</p>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button size="sm" variant="secondary" className="cursor-pointer">
+                                        Edit
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="bg-zinc-900 border border-zinc-800 max-w-lg">
                                     <QuestionForm
                                         updateAction={updateQuestion.bind(null, q.id)}
                                         deleteAction={deleteQuestion.bind(null, q.id)}
@@ -132,11 +138,11 @@ export default async function StackPage({ params }: { params: { id: string } }) 
                                             maxValue: q.maxValue ?? undefined,
                                         }}
                                     />
-                                </CardContent>
-                            </Card>
-                        </div>
-                    ))}
-                </div>
+                                </DialogContent>
+                            </Dialog>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
     );
