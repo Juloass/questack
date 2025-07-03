@@ -40,7 +40,7 @@ export default async function RootLayout({
             <HeaderUserMenu />
           </header>
 
-          <main className="flex-1 overflow-hidden">
+          <main className="flex-1">
             {!isDbHealthy ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-2xl text-zinc-300">🚧 Maintenance</h1>
