@@ -38,9 +38,20 @@ export default async function StackPage({ params }: { params: { id: string } }) 
     if (!stack) return notFound();
 
     return (
-        <div className="flex flex-col overflow-hidden text-white bg-zinc-950">
-            {/* Header */}
-            <div className="shrink-0 border-b border-zinc-800 px-4 py-4 flex items-center justify-between gap-3">
+        <div className="h-full flex overflow-hidden text-white bg-zinc-950">
+            <aside className="w-64 shrink-0 border-r border-zinc-800 p-4 overflow-y-auto">
+                <h2 className="text-lg font-bold mb-2">About this stack</h2>
+                {stack.description ? (
+                    <p className="text-zinc-300">{stack.description}</p>
+                ) : (
+                    <p className="text-zinc-500 italic">No description</p>
+                )}
+                <p className="text-zinc-400 mt-4">Questions: {stack.questions.length}</p>
+            </aside>
+
+            <div className="flex flex-col flex-1 overflow-hidden">
+                {/* Header */}
+                <div className="shrink-0 border-b border-zinc-800 px-4 py-4 flex items-center justify-between gap-3">
                 {/* Back Link */}
                 <Link
                     href="/dashboard"
@@ -109,33 +120,34 @@ export default async function StackPage({ params }: { params: { id: string } }) 
                         <QuestionForm updateAction={addQuestion.bind(null, stack.id)} />
                     </DialogContent>
                 </Dialog>
-            </div>
+                </div>
 
-            {/* Scrollable Questions area */}
-            <div className="flex-1 overflow-y-auto">
-                <div className="px-4 py-6 flex flex-wrap gap-4 justify-center">
-                    {stack.questions.map((q) => (
-                        <div
-                            key={q.id}
-                            className="flex-1 min-w-[250px] max-w-sm grow sm:basis-[45%] md:basis-[30%] lg:basis-[22%]"
-                        >
-                            <Card className="bg-zinc-900 border border-zinc-800 h-full">
-                                <CardContent className="p-4">
-                                    <QuestionForm
-                                        updateAction={updateQuestion.bind(null, q.id)}
-                                        deleteAction={deleteQuestion.bind(null, q.id)}
-                                        defaultValues={{
-                                            content: q.content,
-                                            type: q.type,
-                                            choices: q.choices,
-                                            minValue: q.minValue ?? undefined,
-                                            maxValue: q.maxValue ?? undefined,
-                                        }}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </div>
-                    ))}
+                {/* Scrollable Questions area */}
+                <div className="flex-1 overflow-y-auto">
+                    <div className="px-4 py-6 flex flex-wrap gap-4 justify-center">
+                        {stack.questions.map((q) => (
+                            <div
+                                key={q.id}
+                                className="flex-1 min-w-[250px] max-w-sm grow sm:basis-[45%] md:basis-[30%] lg:basis-[22%]"
+                            >
+                                <Card className="bg-zinc-900 border border-zinc-800 h-full">
+                                    <CardContent className="p-4">
+                                        <QuestionForm
+                                            updateAction={updateQuestion.bind(null, q.id)}
+                                            deleteAction={deleteQuestion.bind(null, q.id)}
+                                            defaultValues={{
+                                                content: q.content,
+                                                type: q.type,
+                                                choices: q.choices,
+                                                minValue: q.minValue ?? undefined,
+                                                maxValue: q.maxValue ?? undefined,
+                                            }}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
