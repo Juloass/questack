@@ -4,6 +4,7 @@ import { requireSession } from "@/lib/auth";
 import { QuestionType } from "@/lib/generated/prisma";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 const ALLOWED_QUESTION_TYPES = new Set<QuestionType>([
   "BOOLEAN",
@@ -161,4 +162,24 @@ export async function updateStack(stackId: string, formData: FormData) {
   });
 
   revalidatePath(`/dashboard/stack/${stackId}`);
+}
+
+export async function deleteStack(stackId: string) {
+  const session = await requireSession();
+
+  if (!stackId) throw new Error("Invalid stack ID.");
+
+  const stack = await prisma.stack.findUnique({
+    where: { id: stackId },
+    select: { ownerId: true },
+  });
+
+  if (!stack || stack.ownerId !== session.userId) {
+    throw new Error("Unauthorized or stack not found.");
+  }
+
+  await prisma.stack.delete({ where: { id: stackId } });
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
 }
